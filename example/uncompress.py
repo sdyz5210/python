@@ -12,14 +12,13 @@ if len(sys.argv) != 3:
 	sys.exit(0)
 currentPath = sys.argv[1]
 uncompressPath = sys.argv[2]
-lists = []
-if os.path.isdir(currentPath) && os.path.isdir(uncompressPath) :
+if os.path.isdir(currentPath) and os.path.isdir(uncompressPath) :
 	for root,dirs,files in os.walk(currentPath):
 		for f in files:
+			print type(f)
 			if f.endswith('.gz'):
-				lists.append(os.path.join(root,f))
-				tar = tarfile.open(os.path.join(root,f))
-				tar.extractall(path=uncompressPath)
-				tar.close()
+				with tarfile.open(os.path.join(root,f)) as tar:
+					#print os.path.basename(tar.name)
+					tar.extractall(path=uncompressPath)
 else:
 	print '您输入不是一个目录'
