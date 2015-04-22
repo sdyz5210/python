@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+#version1.0,此版本使用biopython实现
+
 from Bio.Seq import Seq
 from Bio.Alphabet import IUPAC
 
