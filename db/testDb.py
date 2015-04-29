@@ -4,7 +4,7 @@
 import mysql.connector
 
 #注意把password设置成数据库root的口令
-conn = mysql.connector.connect(user='root',password='novacloud',database='test',use_unicode=True)
+conn = mysql.connector.connect(user='root',password='abc123',database='test',use_unicode=True)
 
 cursor = conn.cursor()
 
