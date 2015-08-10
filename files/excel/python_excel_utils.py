@@ -26,7 +26,7 @@ def readExcel(path,isHeader):
 		print "行数:%d,列数:%d",(rowNum,colNum)
 
 		for i in range(rowNum):
-			if header and (i == 0):
+			if isHeader and (i == 0):
 				continue
 			row = sheets1.row_values(i)
 			if row :
