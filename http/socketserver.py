@@ -60,8 +60,6 @@ def example3():
 	server = ForkServer(('localhost', 10000), Handler)
 	server.serve_forever()
 
-example3()
-
 #多线程
 #资源消费比较少，但是存在共享资源同步问题
 from SocketServer import TCPServer, ThreadingMixIn, StreamRequestHandler
@@ -83,3 +81,42 @@ class Handler(StreamRequestHandler):
 def example4():
 	server = ThreadServer(('localhost', 10000), Handler)
 	server.serve_forever()
+
+import threading
+import time
+import struct
+
+class UploadHandler(StreamRequestHandler):
+	def handle(self):
+		FILEINFO_SIZE = struct.calcsize('128sI')
+		while True:
+			fhead = self.request.recv(FILEINFO_SIZE)
+			filename,filesize = struct.unpack('128sI',fhead)
+			print filename,len(filename),type(filename)
+			print filesize
+			#命名新文件new_传送的文件
+			filename = "new_"+filename.strip('\00')
+			with open(filename,'wb') as f:
+				restsize = filesize
+				print "recving..."
+				while True:
+					#如果剩余数据包大于1024，就去1024的数据包
+					if restsize > 1024:
+						filedata = self.request.recv(1024)
+					else:
+						filedata = self.request.recv(restsize)
+						f.write(filedata)
+						break
+					if not filedata:
+						break
+					f.write(filedata)
+					restsize = restsize - len(filedata)#计算剩余数据包大小
+					if restsize <= 0:
+						break
+
+def example5_2():
+	server = ThreadServer(('192.168.100.123', 10000), UploadHandler)
+	server.serve_forever()
+
+if __name__ == '__main__':
+	example5_2()
