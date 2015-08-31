@@ -49,5 +49,5 @@ class Handler(StreamRequestHandler):
 					continue
 		
 
-server = ForkServer(('localhost', 10000), Handler)
+server = ForkServer(('192.168.100.123', 10000), Handler)
 server.serve_forever()

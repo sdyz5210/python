@@ -88,10 +88,10 @@ import struct
 
 class UploadHandler(StreamRequestHandler):
 	def handle(self):
-		FILEINFO_SIZE = struct.calcsize('128sI')
+		FILEINFO_SIZE = struct.calcsize('128s32sI8s')
 		while True:
 			fhead = self.request.recv(FILEINFO_SIZE)
-			filename,filesize = struct.unpack('128sI',fhead)
+			filename,temp1,filesize,temp2 = struct.unpack('128s32sI8s',fhead)
 			print filename,len(filename),type(filename)
 			print filesize
 			#命名新文件new_传送的文件
@@ -101,12 +101,10 @@ class UploadHandler(StreamRequestHandler):
 				print "recving..."
 				while True:
 					#如果剩余数据包大于1024，就去1024的数据包
-					if restsize > 1024:
-						filedata = self.request.recv(1024)
-					else:
+					if restsize < 1024:
 						filedata = self.request.recv(restsize)
-						f.write(filedata)
-						break
+					else:
+						filedata = self.request.recv(1024)
 					if not filedata:
 						break
 					f.write(filedata)

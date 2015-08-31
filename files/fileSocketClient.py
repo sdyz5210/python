@@ -6,7 +6,7 @@ import socket
 import time
 
 sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-sock.connect(('localhost',10000))
+sock.connect(('121.201.7.200',10000))
 
 def sendFile(fileName):
 	sock.send("ready send")

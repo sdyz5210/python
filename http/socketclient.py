@@ -31,8 +31,7 @@ def example3():
 	sock.settimeout(1)
 	while True:
 		filename = raw_input('input your filename------->')#输入文件名
-		FILEINFO_SIZE = struct.calcsize('128sI')#编码格式大小
-		fhead = struct.pack('128sI',filename,os.stat(filename).st_size)#按照规则进行打包
+		fhead = struct.pack('128s11i',filename,0,0,0,0,0,0,0,0,os.stat(filename).st_size,0,0)#按照规则进行打包
 		sock.send(fhead)#发送文件基本信息数据
 		with open(filename,"rb") as f:
 			while True:        #发送文件
@@ -41,6 +40,7 @@ def example3():
 					break
 				sock.send(filedata)
 			print "sending over..."
+		sock.close()
 
 if __name__ == '__main__':
 	example3()
