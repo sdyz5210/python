@@ -8,6 +8,7 @@ import glob
 '''
 使用snakebite可以读取hdfs中数据的信息
 目前没有发现往HDFS中写入数据的方法
+url:https://github.com/spotify/snakebite
 '''
 
 def display():
