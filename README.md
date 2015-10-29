@@ -12,5 +12,3 @@ db:python对数据库的操作
 gui:python gui知识  
 bio:主要是涉及biopython的例子  
 example:使用python实现的基本的生物信息的小功能
-
-
