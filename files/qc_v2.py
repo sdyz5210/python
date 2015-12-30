@@ -6,14 +6,14 @@ import time,datetime
 from itertools import izip
 from contextlib import nested
 
-#fileInputR1 = '/Users/mac/Documents/data/fastq/R1.fastq'
-#fileInputR2 = '/Users/mac/Documents/data/fastq/R2.fastq'
-#fileOutputR1 = '/Users/mac/Documents/data/fastq/R1.out.fastq'
-#fileOutputR2 = '/Users/mac/Documents/data/fastq/R2.out.fastq'
-fileInputR1 = 'R1.fastq'
-fileInputR2 = 'R2.fastq'
-fileOutputR1 = 'R1.out.fastq'
-fileOutputR2 = 'R2.out.fastq'
+fileInputR1 = '/Users/mac/Documents/data/fastq/R1.fastq'
+fileInputR2 = '/Users/mac/Documents/data/fastq/R2.fastq'
+fileOutputR1 = '/Users/mac/Documents/data/fastq/R1.out.fastq'
+fileOutputR2 = '/Users/mac/Documents/data/fastq/R2.out.fastq'
+#fileInputR1 = 'R1.fastq'
+#fileInputR2 = 'R2.fastq'
+#fileOutputR1 = 'R1.out.fastq'
+#fileOutputR2 = 'R2.out.fastq'
 defaultValue = 20
 defaultLength = 30
 
@@ -115,21 +115,29 @@ def main():
 	fastqSeqR1List = []
 	fastqSeqR2List = []
 	with nested(open(fileInputR1,'r'),open(fileInputR2,'r')) as (r1,r2):
-		while 1:
-			fastqSeqR1 = FastqSeq()
-			fastqSeqR1.name = r1.readline()
-			if not fastqSeqR1.name:
-				break
-			fastqSeqR1.seq = r1.readline()
-			fastqSeqR1.plus = r1.readline()
-			fastqSeqR1.seqQ = r1.readline()
-			fastqSeqR2 = FastqSeq()
-			fastqSeqR2.name = r2.readline()
-			fastqSeqR2.seq = r2.readline()
-			fastqSeqR2.plus = r2.readline()
-			fastqSeqR2.seqQ = r2.readline()
-			(fastqSeqR1List,fastqSeqR2List) = toDo(fastqSeqR1,fastqSeqR2,fastqSeqR1List,fastqSeqR2List)
-			if len(fastqSeqR1List) == 50000:
+		i = 0
+		fastqSeqR1 = FastqSeq()
+		fastqSeqR2 = FastqSeq()
+		for a,b in izip(r1, r2):
+			i += 1
+			if i%4 == 1:
+				fastqSeqR1.name = a
+				if not fastqSeqR1.name:
+					break
+				fastqSeqR2.name = b
+			elif i%4 == 2:
+				fastqSeqR1.seq = a
+				fastqSeqR2.seq = b
+			elif i%4 == 3:
+				fastqSeqR1.plus = a
+				fastqSeqR2.plus = b
+			elif i%4 == 0:
+				fastqSeqR1.seqQ = a
+				fastqSeqR2.seqQ = b
+				(fastqSeqR1List,fastqSeqR2List) = toDo(fastqSeqR1,fastqSeqR2,fastqSeqR1List,fastqSeqR2List)
+				fastqSeqR1 = FastqSeq()
+				fastqSeqR2 = FastqSeq()
+			if len(fastqSeqR1List) == 100000:
 				save(fastqSeqR1List,fastqSeqR2List)
 				del fastqSeqR1List[:]
 				del fastqSeqR2List[:]
@@ -140,4 +148,4 @@ if __name__ == '__main__':
 	main()
 	endTime = datetime.datetime.now()
 	t = (endTime-startTime).total_seconds()
-	print '本次运行的时间---v1:',t
+	print '本次运行的时间---v2:',t
