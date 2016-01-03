@@ -2,11 +2,21 @@
 # -*- coding: utf-8 -*-
 # python version 2.7.6
 
-import time,datetime,multiprocessing,logging,psutil
+import time,datetime,multiprocessing,logging,psutil,commands,sys,os
 from contextlib import nested
 
 #810632886--674867570
 #多进程执行
+fileInputR1 = '/Users/mac/Documents/data/fastq/R1.fastq'
+fileInputR2 = '/Users/mac/Documents/data/fastq/R2.fastq'
+fileOutputR1 = '/Users/mac/Documents/data/fastq/R1.out.fastq'
+fileOutputR2 = '/Users/mac/Documents/data/fastq/R2.out.fastq'
+#fileInputR1 = 'R1.fastq'
+#fileInputR2 = 'R2.fastq'
+#fileOutputR1 = 'R1.out.fastq'
+#fileOutputR2 = 'R2.out.fastq'
+defaultQcValue = 20
+defaultLength = 30
 
 logging.basicConfig(filename = "qc.log",level = logging.INFO,format='[%(asctime)s %(levelname)s] %(message)s',datefmt='%Y%m%d %H:%M:%S')
 
@@ -192,18 +202,40 @@ def main():
 		pool.apply_async(task,(i,blockSize*i+1,blockSize*(i+1),))
 	pool.close()
 	pool.join()
+	logging.info('开始执行结果合并')
+	catCommandR1 = 'cat '
+	catCommandR2 = 'cat '
+	rmCommandR1 = 'rm -rf '
+	rmCommandR2 = 'rm -rf '
+	for i in range(blockNum):
+		catCommandR1 += fileOutputR1+str(i)
+		catCommandR1 += ' '
+		catCommandR2 += fileOutputR2+str(i)
+		catCommandR2 += ' '
+		rmCommandR1 += fileOutputR1+str(i)
+		rmCommandR1 += ' '
+		rmCommandR2 += fileOutputR2+str(i)
+		rmCommandR2 += ' '
+	catCommandR1 += '>> '+fileOutputR1
+	catCommandR2 += '>> '+fileOutputR2
+	commands.getstatusoutput(catCommandR1)
+	commands.getstatusoutput(catCommandR2)
+	commands.getstatusoutput(rmCommandR1)
+	commands.getstatusoutput(rmCommandR2)
+	logging.info('结果合并结束，并已删除中间结果文件')
 
-def input():
-	if len(sys.argv) != 6:
+
+def init():
+	if len(sys.argv) != 7:
 		print 'Usage: *.py R1 R2 R1out R2out defaultQcValue defaultLength'
 		sys.exit(0)
+	global fileInputR1,fileInputR2,fileOutputR1,fileOutputR2,defaultQcValue,defaultLength
 	fileInputR1 = sys.argv[1]
 	fileInputR2 = sys.argv[2]
 	fileOutputR1 = sys.argv[3]
 	fileOutputR2 = sys.argv[4]
 	defaultQcValue = sys.argv[5]
 	defaultLength = sys.argv[6]
-
 
 if __name__ == '__main__':
 	startTime = datetime.datetime.now()
