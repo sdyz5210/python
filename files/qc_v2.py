@@ -6,15 +6,11 @@ import time,datetime
 from itertools import izip
 from contextlib import nested
 
-fileInputR1 = '/Users/mac/Documents/data/fastq/R1.fastq'
-fileInputR2 = '/Users/mac/Documents/data/fastq/R2.fastq'
-fileOutputR1 = '/Users/mac/Documents/data/fastq/R1.out.fastq'
-fileOutputR2 = '/Users/mac/Documents/data/fastq/R2.out.fastq'
-#fileInputR1 = 'R1.fastq'
-#fileInputR2 = 'R2.fastq'
-#fileOutputR1 = 'R1.out.fastq'
-#fileOutputR2 = 'R2.out.fastq'
-defaultValue = 20
+fileInputR1 = 'WGC037752_MISEQ_FFPE_Cptest_combined_clean_R1.fastq'
+fileInputR2 = 'WGC037752_MISEQ_FFPE_Cptest_combined_clean_R2.fastq'
+fileOutputR1 = 'R1.out.fastq'
+fileOutputR2 = 'R2.out.fastq'
+defaultQcValue = 20
 defaultLength = 30
 
 class FastqSeq():
@@ -57,34 +53,37 @@ def save(fastqSeqR1List,fastqSeqR2List):
 			r2.flush()
 
 def toDo(fastqSeqR1,fastqSeqR2,fastqSeqR1List,fastqSeqR2List):
+	r1Position = 0
+	r2Position = 0
 	r1_q_isok = False
 	r2_q_isok = False
-	r1Length = r2Length = 0
 	for i,c in enumerate(fastqSeqR1.seqQ):
 		temp = int(ord(c))-diffValue
-		if temp < defaultValue:
-			if i-1 >= defaultLength:
-				fastqSeqR1.seq = fastqSeqR1.seq[0:i-1]
-				fastqSeqR1.seqQ = fastqSeqR1.seqQ[0:i-1]
-				r1_q_isok = True
-				r1Length = i-1
+		r1Position = i
+		if temp < defaultQcValue:
+			r1_q_isok = True
 			break
 	if not r1_q_isok:
+		r1Position += 1
+	if r1Position <= defaultLength:
 		return (fastqSeqR1List,fastqSeqR2List)
 	else:
 		for i,c in enumerate(fastqSeqR2.seqQ):
 			temp = int(ord(c))-diffValue
-			if temp < defaultValue:
-				if i-1 >= defaultLength:
-					fastqSeqR2.seq = fastqSeqR2.seq[0:i-1]
-					fastqSeqR2.seqQ = fastqSeqR2.seqQ[0:i-1]
-					r2_q_isok = True
-					r2Length = i-1
+			r2Position = i
+			if temp < defaultQcValue:
+				r2_q_isok = True
 				break
 	if not r2_q_isok:
+		r2Position += 1
+	if r2Position <= defaultLength:
 		return (fastqSeqR1List,fastqSeqR2List) 
 	else:
 		#质量合格的保存
+		fastqSeqR1.seq = fastqSeqR1.seq[0:r1Position]
+		fastqSeqR1.seqQ = fastqSeqR1.seqQ[0:r1Position]
+		fastqSeqR2.seq = fastqSeqR2.seq[0:r2Position]
+		fastqSeqR2.seqQ = fastqSeqR2.seqQ[0:r2Position]
 		fastqSeqR1List.append(fastqSeqR1)
 		fastqSeqR2List.append(fastqSeqR2)
 		return (fastqSeqR1List,fastqSeqR2List)

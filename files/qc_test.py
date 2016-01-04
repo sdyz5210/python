@@ -33,16 +33,39 @@ def read2():
 		i = 0
 		for a,b in izip(r1, r2):
 			i += 1
-			if i == 20000000:
-				print a
-				print b
 		print 'read2=',i
+
+def read3():
+	with nested(open(fileInputR1,'r'),open(fileInputR2,'r')) as (r1,r2):
+		i = 0
+		while 1:
+			i += 4
+			line = r1.readlines(4)
+			if not line:
+				break
+		print 'read1=',i
+
+def read4():
+	s = 'abcdefg'
+	for i,c in enumerate(s):
+		print i,c
+		if i == 6:
+			print s[0:i]
+
+def read5():
+	s = '@CCCCGGGGGGGGFGGFGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGDFGGGDFGCGGFGGGGGGGGGGCF7CG7:FGGDGFGGCGGEGGGFFFFC'
+	for i,c in enumerate(s):
+		temp = int(ord(c))-33
+		print temp
+		if temp < 20:
+			if i > 30:
+				print s[0:i]
+			break
 
 if __name__ == '__main__':
 	startTime = datetime.datetime.now()
-	#read2()
-	for i in range(4):
-		print i
+	read4()
+	#print int(10/4)
 	endTime = datetime.datetime.now()
 	t = (endTime-startTime).total_seconds()
 	print '本次运行的时间',t
