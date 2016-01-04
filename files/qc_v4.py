@@ -88,7 +88,7 @@ def toDo(fastqSeqR1,fastqSeqR2,fastqSeqR1List,fastqSeqR2List):
 		r1Position = i
 		if temp < defaultQcValue:
 			break
-	if r1Position <= defaultLength:
+	if r1Position < defaultLength:
 		return (fastqSeqR1List,fastqSeqR2List)
 	else:
 		for i,c in enumerate(fastqSeqR2.seqQ):
@@ -96,7 +96,7 @@ def toDo(fastqSeqR1,fastqSeqR2,fastqSeqR1List,fastqSeqR2List):
 			r2Position = i
 			if temp < defaultQcValue:
 				break
-	if r2Position <= defaultLength:
+	if r2Position < defaultLength:
 		return (fastqSeqR1List,fastqSeqR2List) 
 	else:
 		#质量合格的保存

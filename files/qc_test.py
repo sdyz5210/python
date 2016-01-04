@@ -61,11 +61,31 @@ def read5():
 			if i > 30:
 				print s[0:i]
 			break
+def write1():
+	with open('test1','a') as f1:
+		for i in range(10000):
+			f1.write(str(i))
+			f1.write('\n')
+		f1.flush()
+	with open('test2','a') as f2:
+		for i in range(10000):
+			f2.write(str(i))
+			f2.write('\n')
+		f2.flush()
+
+def write2():
+	with open('test1','a') as f1,open('test2','a') as f2:
+		for i in range(10000):
+			f1.write(str(i))
+			f1.write('\n')
+			f2.write(str(i))
+			f2.write('\n')
+		f1.flush()
+		f2.flush()
 
 if __name__ == '__main__':
 	startTime = datetime.datetime.now()
-	read4()
-	#print int(10/4)
+	write1()
 	endTime = datetime.datetime.now()
 	t = (endTime-startTime).total_seconds()
 	print '本次运行的时间',t

@@ -4,14 +4,9 @@
 
 import time,datetime,multiprocessing,logging,psutil,commands,sys,os
 from contextlib import nested
-from itertools import izip
 
 #810632886--674867570
-#多进程执行--使用izip进行文件遍历读取，性能不错
-#fileInputR1 = '/Users/mac/Documents/data/fastq/R1.fastq'
-#fileInputR2 = '/Users/mac/Documents/data/fastq/R2.fastq'
-#fileOutputR1 = '/Users/mac/Documents/data/fastq/R1.out.fastq'
-#fileOutputR2 = '/Users/mac/Documents/data/fastq/R2.out.fastq'
+#多进程执行
 fileInputR1 = 'WGC037752_MISEQ_FFPE_Cptest_combined_clean_R1.fastq'
 fileInputR2 = 'WGC037752_MISEQ_FFPE_Cptest_combined_clean_R2.fastq'
 fileOutputR1 = 'R1.out.fastq'
@@ -49,42 +44,6 @@ def save(fastqSeqR1List,fastqSeqR2List):
 			r2.write(fastqSeqR2.seqQ+"\n")
 			r2.flush()
 
-def toDo(fastqSeqR1,fastqSeqR2,fastqSeqR1List,fastqSeqR2List):
-	r1Position = 0
-	r2Position = 0
-	r1_q_isok = False
-	r2_q_isok = False
-	for i,c in enumerate(fastqSeqR1.seqQ):
-		temp = int(ord(c))-diffValue
-		r1Position = i
-		if temp < defaultQcValue:
-			r1_q_isok = True
-			break
-	if not r1_q_isok:
-		r1Position += 1
-	if r1Position < defaultLength:
-		return (fastqSeqR1List,fastqSeqR2List)
-	else:
-		for i,c in enumerate(fastqSeqR2.seqQ):
-			temp = int(ord(c))-diffValue
-			r2Position = i
-			if temp < defaultQcValue:
-				r2_q_isok = True
-				break
-	if not r2_q_isok:
-		r2Position += 1
-	if r2Position < defaultLength:
-		return (fastqSeqR1List,fastqSeqR2List) 
-	else:
-		#质量合格的保存
-		fastqSeqR1.seq = fastqSeqR1.seq[0:r1Position]
-		fastqSeqR1.seqQ = fastqSeqR1.seqQ[0:r1Position]
-		fastqSeqR2.seq = fastqSeqR2.seq[0:r2Position]
-		fastqSeqR2.seqQ = fastqSeqR2.seqQ[0:r2Position]
-		fastqSeqR1List.append(fastqSeqR1)
-		fastqSeqR2List.append(fastqSeqR2)
-		return (fastqSeqR1List,fastqSeqR2List)
-
 def judgmentValue():
 	diffValue = 0
 	j = 0
@@ -95,10 +54,10 @@ def judgmentValue():
 			if j%4 == 0:
 				for j,c in enumerate(line):
 					temp = int(ord(c))
-					if temp <= 53:
+					if temp < 59:
 						diffValue = 33
 						break
-					if temp >= 84:
+					if temp > 74:
 						diffValue = 64
 						break
 			if diffValue!=0:
@@ -121,16 +80,47 @@ def save(fastqSeqR1List,fastqSeqR2List,processId):
 			r2.write(fastqSeqR2.seqQ+"\n")
 			r2.flush()
 
+def toDo(fastqSeqR1,fastqSeqR2,fastqSeqR1List,fastqSeqR2List):
+	r1Position = 0
+	r2Position = 0
+	for i,c in enumerate(fastqSeqR1.seqQ):
+		temp = int(ord(c))-diffValue
+		r1Position = i
+		if temp < defaultQcValue:
+			break
+	if r1Position < defaultLength:
+		return (fastqSeqR1List,fastqSeqR2List)
+	else:
+		for i,c in enumerate(fastqSeqR2.seqQ):
+			temp = int(ord(c))-diffValue
+			r2Position = i
+			if temp < defaultQcValue:
+				break
+	if r2Position < defaultLength:
+		return (fastqSeqR1List,fastqSeqR2List) 
+	else:
+		#质量合格的保存
+		fastqSeqR1.seq = fastqSeqR1.seq[0:r1Position]
+		fastqSeqR1.seqQ = fastqSeqR1.seqQ[0:r1Position]
+		fastqSeqR2.seq = fastqSeqR2.seq[0:r2Position]
+		fastqSeqR2.seqQ = fastqSeqR2.seqQ[0:r2Position]
+		fastqSeqR1List.append(fastqSeqR1)
+		fastqSeqR2List.append(fastqSeqR2)
+		return (fastqSeqR1List,fastqSeqR2List)
+
 def task(processId,startLine,endLine):
 	logging.info('开始执行进程：'+str(processId)+'--开始行数：'+str(startLine)+'--结束行数：'+str(endLine))
 	fastqSeqR1 = FastqSeq()
 	fastqSeqR2 = FastqSeq()
 	fastqSeqR1List = []
 	fastqSeqR2List = []
-	i = 0
+	i = 1
 	with nested(open(fileInputR1,'r'),open(fileInputR2,'r')) as (r1,r2):
-		for a,b in izip(r1,r2):
-			i += 1
+		while 1:
+			a = r1.readline()
+			b = r2.readline()
+			if not a:
+				break
 			if startLine <= i and i <= endLine:
 				if i%4 == 1:
 					fastqSeqR1.name = a
@@ -151,7 +141,8 @@ def task(processId,startLine,endLine):
 					save(fastqSeqR1List,fastqSeqR2List,processId)
 					del fastqSeqR1List[:]
 					del fastqSeqR2List[:]
-		save(fastqSeqR1List,fastqSeqR2List,processId)
+			i += 1
+	save(fastqSeqR1List,fastqSeqR2List,processId)
 
 def main():
 	linecount = getLineCount()
@@ -193,11 +184,10 @@ def main():
 	commands.getstatusoutput(rmCommandR2)
 	logging.info('结果合并结束，并已删除中间结果文件')
 
-def init():
-	if len(sys.argv) != 7:
+def input():
+	if len(sys.argv) != 6:
 		print 'Usage: *.py R1 R2 R1out R2out defaultQcValue defaultLength'
 		sys.exit(0)
-	global fileInputR1,fileInputR2,fileOutputR1,fileOutputR2,defaultQcValue,defaultLength
 	fileInputR1 = sys.argv[1]
 	fileInputR2 = sys.argv[2]
 	fileOutputR1 = sys.argv[3]
@@ -210,4 +200,4 @@ if __name__ == '__main__':
 	main()
 	endTime = datetime.datetime.now()
 	t = (endTime-startTime).total_seconds()
-	logging.info('本次运行的时间---qc:'+str(t))
+	logging.info('本次运行的时间---v5:'+str(t))
