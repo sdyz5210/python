@@ -4,16 +4,15 @@
 
 from Tkinter import *
 
-top = Tk()
+def demo1(top):
+	lb = Listbox(top,selectmode = EXTENDED)
+	lb.pack()
+	for i in ["Python","Java","C","C++","Perl","Go"]:
+		lb.insert(END,i)
+def main():
+	top = Tk()
+	demo1(top)
+	top.mainloop()
 
-lb = Listbox(top)
-
-lb.insert(1,"python")
-lb.insert(2,"Java")
-lb.insert(3,"C")
-lb.insert(4,"C++")
-lb.insert(5,"perl")
-lb.insert(6,"go")
-lb.pack()
-
-top.mainloop()
+if __name__ == '__main__':
+	main()
