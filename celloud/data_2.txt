@@ -1,0 +1,2 @@
+filename,datakey,taskid,create_time,start_time,end_time
+BL201204001230.tar.gz,12030406392956,2000,2012-05-04T15:03:58.074,2012-05-04T15:08:03.906,2012-05-04T16:05:04.523
