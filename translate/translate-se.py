@@ -42,11 +42,18 @@ def readExcel(path,isHeader):
 			if isHeader and (i == 0):
 				continue
 			row = sheets1.row_values(i)
-			content_zh = translator.translate(row[1], dest="zh-CN").text
-			if isinstance(content_zh, unicode):
-				content_zh = content_zh.encode("utf-8")
-			temp = [row[0],row[1],content_zh]
-			rows.append(temp)
+			print "当前行号为:%d,id号为:%s",(i,row[0])
+			content_zh = ""
+			try:
+				content_zh = translator.translate(row[1], dest="zh-CN").text
+				if isinstance(content_zh, unicode):
+					content_zh = content_zh.encode("utf-8")
+				temp = [row[0],row[1],content_zh]
+				rows.append(temp)
+			except Exception, e:
+				temp = [row[0],row[1],""]
+				rows.append(temp)
+			continue
 	writeExcel(rows)
 
 if __name__ == '__main__':
