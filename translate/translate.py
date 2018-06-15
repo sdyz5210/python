@@ -6,18 +6,21 @@ import xlrd
 import xlwt
 from googletrans import Translator
 
+'''
+	主要完成对PubMed文件的翻译
+'''
+
 translator = Translator()
 
 def writeExcel(rows):
 	workbook = xlwt.Workbook(encoding = 'utf-8')
-	table = workbook.add_sheet("PubMed")
+	table = workbook.add_sheet("PubMed_change")
 	for i in range(len(rows)):
 		table.write(i,0,rows[i][0])
 		table.write(i,1,rows[i][1])
 		table.write(i,2,rows[i][2])
 		table.write(i,3,rows[i][3])
-		table.write(i,4,rows[i][4])
-	workbook.save('PubMed-translate.xls')
+	workbook.save('PubMed_change-translate.xls')
 
 #读取Excel工具类
 #path指传递文件的路径包括文件名称，isHeader指是否存在表头
@@ -40,12 +43,19 @@ def readExcel(path,isHeader):
 			if isHeader and (i == 0):
 				continue
 			row = sheets1.row_values(i)
-			content_zh = translator.translate(row[1], dest="zh-CN").text
-			if isinstance(content_zh, unicode):
-				content_zh = content_zh.encode("utf-8")
-			temp = [row[0],row[1],row[2],row[3],content_zh]
-			rows.append(temp)
+			print "当前行号为:%d,id号为:%s",(i,row[0])
+			content_zh = ""
+			try:
+				content_zh = translator.translate(row[1], dest="zh-CN").text
+				if isinstance(content_zh, unicode):
+					content_zh = content_zh.encode("utf-8")
+				temp = [row[0],row[1],row[2],content_zh]
+				rows.append(temp)
+			except Exception, e:
+				temp = [row[0],row[1],row[2],""]
+				rows.append(temp)
+			continue
 	writeExcel(rows)
 
 if __name__ == '__main__':
-	readExcel("PubMed.xlsx",True)
+	readExcel("PubMed_change.xlsx",True)
