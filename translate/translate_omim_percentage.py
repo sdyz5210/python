@@ -14,7 +14,7 @@ from googletrans import Translator
 	3、AlternativeTitles------zh
 	4、CytogeneticLocation	
 	5、GenomicCoordinates
-	6、Text
+	6、Text-------------------zh
 	7、Description------------zh
 	8、Mapping----------------zh
 	9、Cytogenetics-----------zh
@@ -64,6 +64,7 @@ def writeExcel(rows,fileName,extension):
 		table.write(i,26,rows[i][26])
 		table.write(i,27,rows[i][27])
 		table.write(i,28,rows[i][28])
+		table.write(i,29,rows[i][29])
 	workbook.save(fileName)
 
 #读取Excel工具类
@@ -89,13 +90,14 @@ def readExcel(path,fileName,extension,isHeader):
 		for i in range(rowNum):
 			row = sheets1.row_values(i)
 			if isHeader and (i == 0):
-				temp = [row[0],row[1],"PhenotypeName_zh",row[2],"AlternativeTitles_zh",row[3],row[4],row[5],row[6],row[7],"Description_zh",row[8],"Mapping_zh",row[9],"Cytogenetics_zh",row[10],"MolecularGenetics_zh",row[11],"ClinicalSynopsis_zh",row[12],row[13],"ClinicalFeatures_zh",row[14],"PopulationGenetics_zh",row[15],"history_zh",row[16],"Contributors_zh",row[17]]
+				temp = [row[0],row[1],"PhenotypeName_zh",row[2],"AlternativeTitles_zh",row[3],row[4],row[5],"Text_zh",row[6],"Description_zh",row[7],"Mapping_zh",row[8],"Cytogenetics_zh",row[9],"MolecularGenetics_zh",row[10],"ClinicalSynopsis_zh",row[11],row[12],"ClinicalFeatures_zh",row[13],"PopulationGenetics_zh",row[14],"history_zh",row[15],"Contributors_zh",row[16],row[17]]
 				rows.append(temp)
 				continue
 			row = sheets1.row_values(i)
 			print "当前行号为:%d,id号为:%s",(i,row[0])
 			PhenotypeName_zh = translateTozh(row[1])
 			AlternativeTitles_zh = translateTozh(row[2])
+			Text_zh = translateTozh(row[5])
 			Description_zh = translateTozh(row[6])
 			Mapping_zh = translateTozh(row[7])
 			Cytogenetics_zh = translateTozh(row[8])
@@ -105,7 +107,7 @@ def readExcel(path,fileName,extension,isHeader):
 			PopulationGenetics_zh = translateTozh(row[13])
 			history_zh = translateTozh(row[14])
 			Contributors_zh = translateTozh(row[15])
-			temp = [row[0],row[1],PhenotypeName_zh,row[2],AlternativeTitles_zh,row[3],row[4],row[5],row[6],row[7],Description_zh,row[8],Mapping_zh,row[9],Cytogenetics_zh,row[10],MolecularGenetics_zh,row[11],ClinicalSynopsis_zh,row[12],row[13],ClinicalFeatures_zh,row[14],PopulationGenetics_zh,row[15],history_zh,row[16],Contributors_zh,row[17]]
+			temp = [row[0],row[1],PhenotypeName_zh,row[2],AlternativeTitles_zh,row[3],row[4],row[5],Text_zh,row[6],Description_zh,row[7],Mapping_zh,row[8],Cytogenetics_zh,row[9],MolecularGenetics_zh,row[10],ClinicalSynopsis_zh,row[11],row[12],ClinicalFeatures_zh,row[13],PopulationGenetics_zh,row[14],history_zh,row[15],Contributors_zh,row[16],row[17]]
 			rows.append(temp)
 	writeExcel(rows,fileName,extension)
 

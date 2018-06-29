@@ -19,13 +19,15 @@ def test3(a):
 	try:
 		b = a/(a-5)
 	except Exception, e:
+		print e
 		result = False
 		b = 1000
 	return (b,result)
 
 def readFileList():
 	for i in range(1,13):
-		print i
+		(b,result) = test3(i)
+		print b
 
 if __name__ == '__main__':
 	readFileList()
