@@ -11,18 +11,19 @@ from googletrans import Translator
 def writeExcel(rows,fileName,extension):
 	workbook = xlwt.Workbook(encoding = 'utf-8')
 	table = workbook.add_sheet(fileName)
+	oldFileName = fileName
 	fileName = fileName+"_translate"+extension
-	if fileName=='PubMed':
+	if oldFileName=='PubMed':
 		for i in range(len(rows)):
 			table.write(i,0,rows[i][0])
 			table.write(i,1,rows[i][1])
 			table.write(i,2,rows[i][2])
-	elif fileName=="SummaryEvidence":
+	elif oldFileName=="SummaryEvidence":
 		for i in range(len(rows)):
 			table.write(i,0,rows[i][0])
 			table.write(i,1,rows[i][1])
 			table.write(i,2,rows[i][2])
-	elif fileName=="SupportingObservations":
+	elif oldFileName=="SupportingObservations":
 		for i in range(len(rows)):
 			table.write(i,0,rows[i][0])
 			table.write(i,1,rows[i][1])
@@ -38,8 +39,6 @@ def writeExcel(rows,fileName,extension):
 	fileName:文件名
 	extension:文件后缀
 	isHeader:是否存在表头
-
-	VariationID	Abstract
 '''
 def readExcel(path,fileName,extension,isHeader):
 	#打开excel文件
@@ -52,7 +51,7 @@ def readExcel(path,fileName,extension,isHeader):
 		rowNum = sheets1.nrows
 		colNum = sheets1.ncols
 		colnames =  sheets1.row_values(0)
-		print "行数:%d,列数:%d",(rowNum,colNum)
+		print "行数:%d,列数:%d,文件名:%s",(rowNum,colNum,fileName)
 		if fileName=='PubMed':
 			for i in range(rowNum):
 				row = sheets1.row_values(i)
